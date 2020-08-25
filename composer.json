@@ -1,0 +1,38 @@
+{
+    "name": "vhnh/cart",
+    "license": "MIT",
+    "description": "A shopping cart for your laravel powered e-commerce",
+    "homepage": "http://github.com/vhnh/cart",
+    "authors": [
+        {
+            "name": "Tobias Thaden",
+            "email": "hello@tobiasthaden.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/vhnh/cart/issues",
+        "source": "https://github.com/vhnh/cart"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "Vhnh\\Cart\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Vhnh\\Cart\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^7.2.5"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^5.3"
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+    }
+}
