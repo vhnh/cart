@@ -4,22 +4,22 @@ namespace Vhnh\Cart;
 
 use Vhnh\Cart\Contracts\Buyable;
 use Illuminate\Support\Collection;
+use Illuminate\Session\SessionManager;
 use Vhnh\Cart\Exceptions\DuplicateCartItemException;
 
 class Cart
 {
     protected $items;
-
-    public function __construct(Collection $items)
-    {
-        $this->items = $items;
-    }
     
-    public static function make(?Collection $items = null)
-    {
-        $items = $items ?: new Collection([]);
+    protected $session;
+    
+    protected $name = 'default';
 
-        return new static($items);
+    public function __construct(SessionManager $session)
+    {
+        $this->session = $session;
+
+        $this->resolveItems();
     }
 
     public function add(Buyable $buyable, $quantity)
@@ -33,6 +33,8 @@ class Cart
         $this->items->add(
             new CartItem($buyable, $quantity)
         );
+
+        $this->save();
     }
 
     public function items()
@@ -62,5 +64,23 @@ class Cart
         return $this->items->contains(function ($item) use ($buyable) {
             return $item->ean() === $buyable->ean();
         });
+    }
+
+    protected function save()
+    {
+        $this->session->put('cart.'.$this->name, $this->items->toArray());
+    }
+
+    protected function resolveItems()
+    {
+        if ($this->session->has('cart.'.$this->name)) {
+            $this->items = new Collection(
+                array_map(function ($item) {
+                    return CartItem::hydrate($item);
+                }, $this->session->get('cart.'.$this->name))
+            );
+        } else {
+            $this->items = new Collection([]);
+        }
     }
 }

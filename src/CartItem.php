@@ -3,14 +3,13 @@
 namespace Vhnh\Cart;
 
 use Vhnh\Cart\Contracts\Buyable;
+use Illuminate\Contracts\Support\Arrayable;
 
-use function PHPSTORM_META\argumentsSet;
-
-class CartItem
+class CartItem implements Arrayable
 {
     protected $buyable;
     
-    protected $qunatity;
+    protected $quantity;
 
     public function __construct(Buyable $buyable, $quantity)
     {
@@ -18,9 +17,11 @@ class CartItem
         $this->quantity = $quantity;
     }
 
-    public function buyable()
+    public static function hydrate(array $attributes)
     {
-        return $this->buyable;
+        extract($attributes);
+
+        return new static(resolve(Buyable::class)->hydrate($buyable), $quantity);
     }
 
     public function price()
@@ -41,5 +42,13 @@ class CartItem
     public function __call($method, $arguments)
     {
         return $this->buyable->$method(...$arguments);
+    }
+
+    public function toArray()
+    {
+        return [
+            'buyable' => $this->buyable->toArray(),
+            'quantity' => $this->quantity,
+        ];
     }
 }

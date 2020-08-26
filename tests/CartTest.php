@@ -2,8 +2,6 @@
 
 namespace Vhnh\Cart\Tests;
 
-use Vhnh\Cart\Cart;
-use Vhnh\Cart\CartItem;
 use Vhnh\Cart\Tests\Fakes\Product;
 use Vhnh\Cart\Exceptions\DuplicateCartItemException;
 
@@ -14,7 +12,7 @@ class CartTest extends TestCase
     {
         $buyable = new Product;
 
-        $cart = Cart::make();
+        $cart = $this->cart();
 
         $cart->add($buyable, 1);
 
@@ -30,7 +28,7 @@ class CartTest extends TestCase
             'ean' => 123456
         ]);
 
-        $cart = Cart::make();
+        $cart = $this->cart();
 
         $cart->add($buyable, 1);
         $cart->add($buyable, 1);
@@ -39,24 +37,19 @@ class CartTest extends TestCase
     /** @test */
     public function it_has_a_total()
     {
-        $items = collect([
-            new CartItem(new Product(['price' => 100, 'ean' => 123456]), 1), // 100
-            new CartItem(new Product(['price' => 500, 'ean' => 345612]), 5), // 2500
-        ]);
-
-        $cart = Cart::make($items);
+        $cart = $this->cart();
+        $cart->add(new Product(['price' => 100, 'ean' => 123456]), 1);
+        $cart->add(new Product(['price' => 500, 'ean' => 345612]), 5);
         $this->assertEquals(2600, $cart->total());
     }
 
     /** @test */
     public function it_calculates_the_total_vat()
     {
-        $items = collect([
-            new CartItem(new Product(['price' => 100, 'ean' => 123456, 'vat' => 10]), 1), // 10 = (100 * 0.1)
-            new CartItem(new Product(['price' => 500, 'ean' => 345612, 'vat' => 20]), 5), // 500 = (2500 * 0.2)
-        ]);
+        $cart = $this->cart();
+        $cart->add(new Product(['price' => 100, 'ean' => 123456, 'vat' => 10]), 1); // 10 = (100 * 0.1)
+        $cart->add(new Product(['price' => 500, 'ean' => 345612, 'vat' => 20]), 5); // 500 = (2500 * 0.2)
         
-        $cart = Cart::make($items);
 
         $this->assertEquals([
             '10%' => 10,
@@ -64,5 +57,22 @@ class CartTest extends TestCase
         ], $cart->vat()->toArray());
 
         $this->assertEquals(510, $cart->totalVat());
+    }
+
+    /** @test */
+    public function it_is_stored_in_the_users_session()
+    {
+        $cart = $this->cart();
+        $cart->add(new Product(['price' => 100, 'ean' => 123456, 'vat' => 10]), 1);
+        
+        $this->assertCount(1, app('session')->get('cart.default'));
+        
+        $cart = $this->cart();
+        $this->assertCount(1, $cart->items());
+    }
+
+    protected function cart()
+    {
+        return app('cart');
     }
 }

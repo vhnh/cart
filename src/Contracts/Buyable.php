@@ -9,4 +9,8 @@ interface Buyable
     public function price();
 
     public function vat();
+
+    public function hydrate(array $attributes);
+
+    public function toArray();
 }

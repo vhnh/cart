@@ -8,7 +8,7 @@ class ServiceProvider extends BaseServiceProvider
 {
     public function register()
     {
-        //
+        $this->app->bind('cart', Cart::class);
     }
 
     public function boot()

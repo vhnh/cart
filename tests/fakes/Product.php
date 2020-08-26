@@ -11,6 +11,13 @@ class Product implements Buyable
         $this->attributes = $attributes;
     }
 
+    public function hydrate(array $attributes)
+    {
+        $this->attributes = $attributes;
+
+        return $this;
+    }
+
     public function ean()
     {
         return $this->attributes['ean'];
@@ -24,5 +31,10 @@ class Product implements Buyable
     public function price()
     {
         return $this->attributes['price'];
+    }
+
+    public function toArray()
+    {
+        return $this->attributes;
     }
 }
