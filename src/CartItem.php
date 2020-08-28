@@ -4,6 +4,7 @@ namespace Vhnh\Cart;
 
 use Vhnh\Cart\Contracts\Buyable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\App;
 
 class CartItem implements Arrayable
 {
@@ -21,7 +22,9 @@ class CartItem implements Arrayable
     {
         extract($attributes);
 
-        return new static(resolve(Buyable::class)->hydrate($buyable), $quantity);
+        $buyable = App::make(Buyable::class)->fill($buyable);
+
+        return new static($buyable, $quantity);
     }
 
     public function price()

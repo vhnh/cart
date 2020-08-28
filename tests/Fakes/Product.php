@@ -11,7 +11,7 @@ class Product implements Buyable
         $this->attributes = $attributes;
     }
 
-    public function hydrate(array $attributes)
+    public function fill(array $attributes)
     {
         $this->attributes = $attributes;
 

@@ -10,7 +10,7 @@ interface Buyable
 
     public function vat();
 
-    public function hydrate(array $attributes);
+    public function fill(array $attributes);
 
     public function toArray();
 }
